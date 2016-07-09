@@ -13,15 +13,23 @@
   by Scott Fitzgerald
  */
 
+#include <IRremote.h> 
+
 #define Tcambio 3000 //milisegundos que tarda la transición
 #define Npasos 200 //pasos en los que realizamos la transición
+
+int RECV_PIN = 2;
+
+IRrecv irrecv(RECV_PIN);
+
+decode_results results;
 
   int counter = 0;
   double Tactual, Tinicio;
   int cr, cg, cb;
   int cr_old, cg_old, cb_old;
   double ir, ig, ib;
-  
+  int modo = 1;
   
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -33,6 +41,8 @@ void setup() {
   Tinicio = millis();
   
   Serial.begin(9600);
+  irrecv.enableIRIn(); // Start the receiver
+
   
   analogWrite(3, 20);  
   analogWrite(5, 0);
@@ -63,7 +73,25 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
+
+  if (irrecv.decode(&results)) {
+    //Serial.println(results.value, HEX);
+    
+    //maq. estados valores.
+    //leer valores results.value -> Activar modo que toque.
+    
+    irrecv.resume(); // Receive the next value
+  }
+
+
+  if (modo == 0) //modo apaga luces.
+  {
+    
+  }
   
+
+  else if (modo == 1) //modo inicial, colores cambian.
+  {
   Tactual = millis()-Tinicio;
   
   if (Tactual>=(Tcambio))
@@ -127,6 +155,12 @@ void loop() {
   
   delay(Tcambio/(Npasos));
   
-  }  
+  }
+  }
 
+    else if (modo == 2)
+  {
+  }
+    //Más modos, colores fijos, etc.
+  
 }
